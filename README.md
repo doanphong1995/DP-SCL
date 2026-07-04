@@ -31,14 +31,34 @@ The repository supports three datasets: `xuetangx`, `oulad`, and `snap`.
 
 ```text
 .
-|-- train_experiment.py        # main training/evaluation script
-|-- train.py                   # compatibility wrapper for the old CLI
-|-- run_scripts/run_dp_scl.py  # convenience launcher
-|-- src/models/                # DP-SCL model, SupCon loss, augmentation
-|-- src/dataprocess/           # data preprocessing scripts
+|-- train.py                   # CLI entry point
+|-- src/
+|   `-- dpscl/                 # DP-SCL package
+|       |-- cli.py             # argument parsing
+|       |-- experiment.py      # multi-seed orchestration and output layout
+|       |-- trainer.py         # single-seed train/eval loop
+|       |-- data.py            # NPZ loading, seeding, DataLoader creation
+|       |-- splits.py          # stratified split helpers
+|       |-- metrics.py         # threshold selection, metrics, summary stats
+|       |-- reporting.py       # CSV and text report writers
+|       |-- datasets.py        # dataset metadata
+|       |-- modes.py           # mode constants
+|       |-- config.py          # shared constants and model params
+|       `-- model/             # DP-SCL model, layers, losses
+|-- tests/                     # smoke tests
 |-- datastore/                 # .npz data files
+|-- deleted/                   # parked files not used by the clean runtime
 |-- requirements.txt
 `-- README.md
+```
+
+The training flow is intentionally linear:
+
+```text
+train.py -> src/dpscl/cli.py
+         -> src/dpscl/experiment.py
+         -> src/dpscl/trainer.py
+         -> src/dpscl/model/
 ```
 
 ## Installation
@@ -78,25 +98,32 @@ stratified splits for each seed using the default ratio
 Quick run on XuetangX:
 
 ```bash
-python run_scripts/run_dp_scl.py -indir . -outdir . --dataset xuetangx --max-epochs 200
+python train.py -indir . -outdir . --dataset xuetangx --max-epochs 200
 ```
 
-Run the main training script directly:
+By default, this runs the five reported seeds:
+
+```text
+1 11 111 1111 11111
+```
+
+You can also pass them explicitly:
 
 ```bash
-python train_experiment.py -indir . -outdir . --dataset xuetangx --seeds 1 11 111 1111 11111 --max-epochs 200
+python train.py -indir . -outdir . --dataset xuetangx --seeds 1 11 111 1111 11111 --max-epochs 200
 ```
 
 Run on another dataset:
 
 ```bash
-python train_experiment.py -indir . -outdir . --dataset oulad --max-epochs 200
-python train_experiment.py -indir . -outdir . --dataset snap --max-epochs 200
+python train.py -indir . -outdir . --dataset oulad --max-epochs 200
+python train.py -indir . -outdir . --dataset snap --max-epochs 200
 ```
 
 Common arguments:
 
 ```text
+--seeds           random seeds, default 1 11 111 1111 11111
 --batch-size      batch size, default 256
 --lr              learning rate, default 1e-4
 --hidden-size     encoder hidden size, default 128
@@ -133,5 +160,26 @@ the test split.
 ## Quick Test
 
 ```bash
-python -m pytest src/tests/test_dp_scl.py
+python -m pytest tests/test_dp_scl.py
 ```
+
+## Developer Notes
+
+When changing the training pipeline, prefer editing the focused modules under
+`src/dpscl/`:
+
+| Task | File |
+| --- | --- |
+| Add or change CLI flags | `src/dpscl/cli.py` |
+| Change run directory layout or multi-seed flow | `src/dpscl/experiment.py` |
+| Change training objective or early stopping | `src/dpscl/trainer.py` |
+| Change data loading or tensor conversion | `src/dpscl/data.py` |
+| Change train/val/test split logic | `src/dpscl/splits.py` |
+| Change metrics or threshold selection | `src/dpscl/metrics.py` |
+| Change result files or report text | `src/dpscl/reporting.py` |
+| Change neural network architecture | `src/dpscl/model/` |
+
+Files that are not part of the clean training runtime were moved to
+`deleted/` for review before permanent deletion. This includes old launchers,
+plot outputs, reports, exploratory scripts, local docs, and preprocessing
+helpers.

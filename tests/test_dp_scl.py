@@ -9,7 +9,7 @@ Reference source:
 
 import torch
 
-from src.models import DPSCLModel, SupConLoss
+from src.dpscl.model import DPSCLModel, SupConLoss
 
 
 def test_dp_scl_forward_and_loss():

@@ -14,7 +14,7 @@ Reference source:
 
 import sys
 
-from train_experiment import main
+from src.dpscl.cli import main
 
 
 if __name__ == "__main__":

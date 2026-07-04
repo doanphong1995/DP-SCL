@@ -21,7 +21,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-from .common import (
+from .layers import (
     ActionWeightedInput,
     AugmentationModule,
     EarlyPredictionMask,
