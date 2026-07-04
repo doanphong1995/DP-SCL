@@ -1,4 +1,13 @@
-"""Loss functions used by DP-SCL."""
+"""
+Loss functions used by DP-SCL.
+
+Reference sources:
+  Supervised Contrastive Learning, Khosla et al., NeurIPS 2020:
+  https://proceedings.neurips.cc/paper/2020/hash/d89a66c7c80a29b1bdbab0f2a1a94af8-Abstract.html
+
+  SupContrast PyTorch reference implementation by HobbitLong:
+  https://github.com/HobbitLong/SupContrast
+"""
 
 import torch
 from torch import nn
@@ -35,4 +44,3 @@ class SupConLoss(nn.Module):
         positive_count = torch.clamp(mask.sum(dim=1), min=1)
         mean_log_prob = (mask * log_prob).sum(dim=1) / positive_count
         return -mean_log_prob.mean()
-

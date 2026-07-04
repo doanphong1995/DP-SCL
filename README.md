@@ -27,6 +27,21 @@ loss = BCEWithLogitsLoss(logits, label)
 
 The repository supports three datasets: `xuetangx`, `oulad`, and `snap`.
 
+## Reference Sources
+
+This implementation was written for the DP-SCL project and uses the following
+public references for architecture compatibility and loss implementation:
+
+| Component | Reference |
+| --- | --- |
+| CA-TFHN baseline/code structure reference | https://github.com/codeds27/CA-TFHN |
+| CA-TFHN XuetangX data download script | https://github.com/codeds27/CA-TFHN/blob/main/dump_data.sh |
+| CA-TFHN feature extraction script | https://github.com/codeds27/CA-TFHN/blob/main/feat_extract.sh |
+| CA-TFHN data preprocessing package | https://github.com/codeds27/CA-TFHN/tree/main/src/dataprocess |
+| CA-TFHN `MySelfAttention` reference | https://github.com/codeds27/CA-TFHN/blob/main/src/models.py |
+| SupContrast PyTorch implementation | https://github.com/HobbitLong/SupContrast |
+| Supervised Contrastive Learning paper | https://proceedings.neurips.cc/paper/2020/hash/d89a66c7c80a29b1bdbab0f2a1a94af8-Abstract.html |
+
 ## Main Structure
 
 ```text
